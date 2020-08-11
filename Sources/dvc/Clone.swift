@@ -96,5 +96,6 @@ struct Clone: ParsableCommand {
                 quit("An error occurred while executing 'git clone \(argumentURL)'")
             }
         }
+        print("Successfully cloned repository \(accountFolder)/\(repoName)")
     }
 }
