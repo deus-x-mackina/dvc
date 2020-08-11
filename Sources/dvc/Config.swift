@@ -72,7 +72,7 @@ fileprivate func whichGit() -> String {
     if #available(macOS 10.13, *) {
         which.executableURL = url
     } else {
-        which.launchPath = "/usr/bin/which"
+        which.launchPath = url.path
     }
     which.arguments = ["git"]
     let pipe = Pipe()
