@@ -5,7 +5,7 @@ locally-cloned GitHub repositories in one place. It functions very similarly to
 your favorite command line package managers such as `npm`, `brew`, or `apt`, but
 is meant to be much simpler.
 
-```
+```shell script
 $ dvc clone attaswift/bigint
 ...
 $ dvc clone trekhleb/javascript-algorithms
@@ -53,6 +53,7 @@ ironic, I know!)
 
 ```shell script
 $ git clone https://github.com/deus-x-mackina/dvc.git
+...
 $ cd dvc
 ```
 
@@ -60,6 +61,7 @@ Once inside the repository, ask Swift to build the package for you.
 
 ```shell script
 $ swift build -c release
+# Creates a ./.build directory
 ```
 
 Now the binary will be located within the `./.build` directory. Copy the binary
@@ -76,6 +78,7 @@ Personally, I prefer to put it in `~/bin`. Now, you may need to restart your
 shell.
 
 ```shell script
+# Reload boot the shell
 $ exec -l $SHELL
 ```
 
@@ -88,6 +91,7 @@ good news! Binaries made with Apple's `ArgumentParser` library come bundled with
 a subcommand for doing just that.
 
 ```shell script
+# Replace <shell> with bash or zsh
 $ dvc --generate-completion-script <shell> > /path/to/completion/_dvc
 ```
 
@@ -101,7 +105,8 @@ more information about this command, [see here](https://github.com/apple/swift-a
 
 ### `dvc`
 
-```
+```text
+$ dvc help
 OVERVIEW: Manage cloned GitHub repos.
 
 USAGE: dvc [--prefix] <subcommand>
@@ -121,7 +126,8 @@ SUBCOMMANDS:
 
 ### `dvc clone`
 
-```
+```text
+$ dvc help clone
 OVERVIEW: Clone a repository.
 
 USAGE: dvc clone <repo>
@@ -139,7 +145,8 @@ OPTIONS:
 
 ### `dvc ls`
 
-```
+```text
+$ dvc help ls
 OVERVIEW: List the currently cloned repos.
 
 USAGE: dvc ls [--display <display>]
@@ -153,7 +160,8 @@ OPTIONS:
 
 ### `dvc rm`
 
-```
+```text
+$ dvc help rm
 OVERVIEW: Remove a cloned repository.
 
 USAGE: dvc rm <repo> [--aggressive-clean]
@@ -191,7 +199,11 @@ execute a quick workaround. To change into `foo/bar` simply execute:
 
 ```shell script
 $ cd $(dvc --prefix)/foo/bar
+# You are now in $DVC_ROOT/foo/bar
 ```
+
+Alternatively, [this script](bin/dvcd.sh) can be pasted into your favorite
+shell `profile` file in order to offer this functionality.
 
 ## Acknowledgements
 
