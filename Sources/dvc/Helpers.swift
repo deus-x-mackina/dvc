@@ -20,6 +20,9 @@ func quit(_ message: String) -> Never {
 /// Currently this is only used by the `ls` subcommand.
 /// I had refactored it here because it was going to be used elsewhere,
 /// but ended up not using it there.
+///
+/// - Parameter argument: The argument from stdin to parse, representing a user and a repo
+/// - Returns: A `Folder` object tuple with the account parent folder and the repo child folder.
 func extract(argument: String) -> (accountFolder: Folder, repoFolder: Folder) {
     let extracted = argument.split(separator: "/")
 

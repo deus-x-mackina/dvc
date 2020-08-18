@@ -10,10 +10,10 @@ import Foundation
 /// in the current shell environment.
 fileprivate let defaultManagedName = "DVC_Repos"
 
-/// Get git path from the environment or by running which
+/// Get git path from the environment or by running which.
 let gitPath: String = ProcessInfo.processInfo.environment["DVC_GIT"] ?? whichGit()
 
-/// Get path for directory to manage from environment or use the default $HOME/defaultManagedName
+/// Get path for directory to manage from environment or use the default $HOME/defaultManagedName.
 let managedPath: String =
     ProcessInfo.processInfo.environment["DVC_ROOT"]
     ?? URL(fileURLWithPath: ProcessInfo.processInfo.environment["HOME"]!).appendingPathComponent(
@@ -21,6 +21,7 @@ let managedPath: String =
     ).path
 
 /// Helper function that is executed prior to parsing command line arguments directly.
+///
 /// It sets up the managed directory path and git executable path and ensures they exist.
 func configure() {
     // Dont configure if invoked with help, version, prefix or no args
