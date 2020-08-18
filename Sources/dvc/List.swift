@@ -3,14 +3,13 @@
 // Copyright (c) 2020 Danny Mack.
 //
 
-import Foundation
 import ArgumentParser
 import Files
+import Foundation
 
 struct List: ParsableCommand {
     static var configuration = CommandConfiguration(
-        commandName: "ls",
-        abstract: "List the currently cloned repos.")
+        commandName: "ls", abstract: "List the currently cloned repos.")
 
     @Option(help: "Display repos as rows or columns.") var display: DisplayOption = .rows
 
@@ -23,8 +22,8 @@ struct List: ParsableCommand {
         // Create a dictionary mapping each account name to a list of all the repo names that are
         // under it.
         let mappings: [String: [String]] = Dictionary(
-            uniqueKeysWithValues:
-            baseDir.subfolders.compactMap { (folder: Folder) -> (String, [String])? in
+            uniqueKeysWithValues: baseDir.subfolders.compactMap {
+                (folder: Folder) -> (String, [String])? in
                 // Ignore top-level git directories (e.g., $DVC_ROOT/someRepo that contains a .git/
                 // directory. This is because repos should be under a subdirectory named after the
                 // repo's account holder.
@@ -41,15 +40,12 @@ struct List: ParsableCommand {
                     return sf.url.lastPathComponent
                 }
                 return (account, repos)
-            }
-        )
+            })
 
         // Now we construct a list of strings from the mappings, each of the format
         // '<account>/<repo>'
         let repos: [String] = mappings.flatMap { account, repos in
-            repos.map { repo in
-                "\(account)/\(repo)"
-            }
+            repos.map { repo in "\(account)/\(repo)" }
         }
 
         // Check the display option and print the results based on that
@@ -89,24 +85,17 @@ struct List: ParsableCommand {
 
         } else {
             // Print each repo on its own line
-            for repo in repos {
-                print(repo)
-            }
+            for repo in repos { print(repo) }
         }
     }
 }
 
-enum DisplayOption: String, ExpressibleByArgument {
-    case columns, rows
-}
+enum DisplayOption: String, ExpressibleByArgument { case columns, rows }
 
-fileprivate func *(lhs: String, rhs: Int) -> String {
+fileprivate func * (lhs: String, rhs: Int) -> String {
     switch rhs {
-    case let x where x <= 0:
-        return ""
-    case 1:
-        return lhs
-    default:
-        return lhs + (lhs * (rhs - 1))
+    case let x where x <= 0: return ""
+    case 1: return lhs
+    default: return lhs + (lhs * (rhs - 1))
     }
 }

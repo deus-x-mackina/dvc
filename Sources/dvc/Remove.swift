@@ -3,30 +3,28 @@
 // Copyright (c) 2020 Danny Mack.
 //
 
-import Foundation
 import ArgumentParser
 import Files
+import Foundation
 
 struct Remove: ParsableCommand {
     static var configuration = CommandConfiguration(
-        commandName: "rm",
-        abstract: "Remove a cloned repository.")
+        commandName: "rm", abstract: "Remove a cloned repository.")
 
     @Argument(
         help: """
-              The repository to remove. Should be in the form <account>/<repo>
-              """
-    ) var repo: String
+            The repository to remove. Should be in the form <account>/<repo>
+            """) var repo: String
 
-    @Flag(help: """
-                By default, DVC will remove an account directory if it not longer contains anything
-                after a repo removal. However, this is blocked if the account directory contains any
-                files or subdirectories in it (whether they are git repos or not). On MacOS systems, 
-                .DS_Store files in the account directory may also cause this behavior. Add this flag
-                to remove the account directory only if it doesn't contain any git repos, ignoring
-                other files and subdirectories.
-                """)
-    var aggressiveClean = false
+    @Flag(
+        help: """
+            By default, DVC will remove an account directory if it not longer contains anything
+            after a repo removal. However, this is blocked if the account directory contains any
+            files or subdirectories in it (whether they are git repos or not). On MacOS systems, 
+            .DS_Store files in the account directory may also cause this behavior. Add this flag
+            to remove the account directory only if it doesn't contain any git repos, ignoring
+            other files and subdirectories.
+            """) var aggressiveClean = false
 
     func run() throws {
         let (accountFolder, repoFolder) = extract(argument: repo)
@@ -46,9 +44,7 @@ struct Remove: ParsableCommand {
                     break
                 }
             }
-            if !abort {
-                try accountFolder.delete()
-            }
+            if !abort { try accountFolder.delete() }
         } else {
             if accountFolder.subfolders.count() == 0, accountFolder.files.count() == 0 {
                 try accountFolder.delete()

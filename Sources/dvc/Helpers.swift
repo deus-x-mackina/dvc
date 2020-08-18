@@ -3,15 +3,13 @@
 // Copyright (c) 2020 Danny Mack.
 //
 
-import Foundation
 import Files
+import Foundation
 
 /// Utility function for printing to standard error and aborting.
 func quit(_ message: String) -> Never {
     var message = message
-    if message.last != nil, message.last.unsafelyUnwrapped != "\n" {
-        message += "\n"
-    }
+    if message.last != nil, message.last.unsafelyUnwrapped != "\n" { message += "\n" }
     fputs(message, stderr)
     exit(EXIT_FAILURE)
 }
@@ -25,18 +23,14 @@ func quit(_ message: String) -> Never {
 func extract(argument: String) -> (accountFolder: Folder, repoFolder: Folder) {
     let extracted = argument.split(separator: "/")
 
-    guard extracted.count == 2 else {
-        quit("Invalid input: \(argument)")
-    }
+    guard extracted.count == 2 else { quit("Invalid input: \(argument)") }
 
     let account = extracted[0]
     let repo = extracted[1]
 
     guard let accountFolder = try? Folder(path: "\(managedPath)/\(account)"),
-          let repoFolder = try? accountFolder.subfolder(named: "\(repo)") else
-    {
-        quit("The repo \(argument) was not found in the managed directory: \(managedPath)")
-    }
+        let repoFolder = try? accountFolder.subfolder(named: "\(repo)")
+    else { quit("The repo \(argument) was not found in the managed directory: \(managedPath)") }
 
     return (accountFolder, repoFolder)
 }
