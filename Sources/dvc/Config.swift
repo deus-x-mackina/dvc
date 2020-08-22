@@ -60,7 +60,7 @@ func configure() {
 
 fileprivate func whichGit() -> String {
     let which = Process()
-    let url = URL(fileURLWithPath: "/usr/bin/which")
+    let url = URL(fileURLWithPath: "/usr/bin/command")
     // If we can't ge to `which` were are in big trouble!
     guard FileManager.default.fileExists(atPath: url.path) else {
         quit(
@@ -71,7 +71,7 @@ fileprivate func whichGit() -> String {
     }
 
     if #available(macOS 10.13, *) { which.executableURL = url } else { which.launchPath = url.path }
-    which.arguments = ["git"]
+    which.arguments = ["-v", "git"]
     let pipe = Pipe()
     which.standardOutput = pipe
     if #available(macOS 10.13, *) { try! which.run() } else { which.launch() }
