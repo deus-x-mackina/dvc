@@ -31,9 +31,9 @@ func extract(argument: String) -> (accountFolder: Folder, repoFolder: Folder) {
     let account = extracted[0]
     let repo = extracted[1]
 
-    guard let accountFolder = try? Folder(path: "\(managedPath)/\(account)"),
+    guard let accountFolder = try? Folder(path: "\(MANAGED_PATH)/\(account)"),
         let repoFolder = try? accountFolder.subfolder(named: "\(repo)")
-    else { quit("The repo \(argument) was not found in the managed directory: \(managedPath)") }
+    else { quit("The repo \(argument) was not found in the managed directory: \(MANAGED_PATH)") }
 
     return (accountFolder, repoFolder)
 }

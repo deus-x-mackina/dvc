@@ -12,10 +12,10 @@ struct Clone: ParsableCommand {
 
     @Argument(
         help: """
-            The repository to clone. 
-            Can be a full URL: https://github.com/<account>/<repo>.git
-            or a shorthand: <account>/<repo>
-            """) var repo: String
+        The repository to clone. 
+        Can be a full URL: https://github.com/<account>/<repo>.git
+        or a shorthand: <account>/<repo>
+        """) var repo: String
 
     func run() throws {
         let account: Substring.SubSequence
@@ -23,16 +23,16 @@ struct Clone: ParsableCommand {
         let argumentURL: String
 
         // Access the managed directory
-        guard let folder = try? Folder(path: managedPath) else {
-            quit("Could not access managed directory at: \(managedPath)")
+        guard let folder = try? Folder(path: MANAGED_PATH) else {
+            quit("Could not access managed directory at: \(MANAGED_PATH)")
         }
 
         // Extract account and repo name
         do {
             // Match repositories given in full HTTPS format
             if let range = repo.range(
-                of: #"(?<=^https://github.com/)\w+/\w+(?=\.git$)"#, options: .regularExpression)
-            {
+                of: #"(?<=^https://github.com/)\w+/\w+(?=\.git$)"#, options: .regularExpression
+            ) {
                 let extracted = repo[range].split(separator: "/")
                 account = extracted[0]
                 repoName = extracted[1]
@@ -68,9 +68,9 @@ struct Clone: ParsableCommand {
         do {
             let process = Process()
             if #available(macOS 10.13, *) {
-                process.executableURL = URL(fileURLWithPath: gitPath)
+                process.executableURL = URL(fileURLWithPath: GIT_PATH)
             } else {
-                process.launchPath = gitPath
+                process.launchPath = GIT_PATH
             }
             process.arguments = [
                 "clone", "\(argumentURL)",

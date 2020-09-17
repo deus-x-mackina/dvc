@@ -9,14 +9,15 @@ import Foundation
 
 struct List: ParsableCommand {
     static var configuration = CommandConfiguration(
-        commandName: "ls", abstract: "List the currently cloned repos.")
+        commandName: "ls", abstract: "List the currently cloned repos."
+    )
 
     @Option(help: "Display repos as rows or columns.") var display: DisplayOption = .rows
 
     func run() throws {
         // Make sure we can get into the managed directory
-        guard let baseDir = try? Folder(path: managedPath) else {
-            quit("Could not access managed directory at: \(managedPath)")
+        guard let baseDir = try? Folder(path: MANAGED_PATH) else {
+            quit("Could not access managed directory at: \(MANAGED_PATH)")
         }
 
         // Create a dictionary mapping each account name to a list of all the repo names that are
@@ -92,7 +93,7 @@ struct List: ParsableCommand {
 
 enum DisplayOption: String, ExpressibleByArgument { case columns, rows }
 
-fileprivate func * (lhs: String, rhs: Int) -> String {
+private func * (lhs: String, rhs: Int) -> String {
     switch rhs {
     case let x where x <= 0: return ""
     case 1: return lhs
