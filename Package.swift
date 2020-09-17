@@ -8,10 +8,12 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/JohnSundell/Files.git",
-            from: "4.1.1"),
+            from: "4.1.1"
+        ),
         .package(
             url: "https://github.com/apple/swift-argument-parser.git",
-            .upToNextMinor(from: "0.2.0")),
+            .upToNextMinor(from: "0.3.0")
+        ),
     ],
     targets: [
         .target(
@@ -19,6 +21,7 @@ let package = Package(
             dependencies: [
                 "Files",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-            ]),
+            ]
+        ),
     ]
 )
