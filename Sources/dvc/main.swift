@@ -3,5 +3,4 @@
 //  Copyright © 2020 Danny Mack. All rights reserved.
 //
 
-configure()
 DVC.main()

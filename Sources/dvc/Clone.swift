@@ -18,17 +18,27 @@ struct Clone: ParsableCommand {
         """) var repo: String
 
     func run() throws {
+        createManagedDirectoryIfNeeded()
         let account: Substring.SubSequence
         let repoName: Substring.SubSequence
         let argumentURL: String
 
         // Access the managed directory
-        guard let folder = try? Folder(path: MANAGED_PATH) else {
+        guard let managedFolder = try? Folder(path: MANAGED_PATH) else {
             quit("Could not access managed directory at: \(MANAGED_PATH)")
         }
 
         // Extract account and repo name
         do {
+            func defaultQuit() -> Never {
+                quit(
+                    """
+                    Could not parse input: \(repo)
+                    Ensure the input is either a full Git url with https:// and .git extension
+                    Or of the shorthand notation <account>/<repo>
+                    """)
+            }
+
             // Match repositories given in full HTTPS format
             if let range = repo.range(
                 of: #"(?<=^https://github.com/)\w+/\w+(?=\.git$)"#, options: .regularExpression
@@ -40,28 +50,23 @@ struct Clone: ParsableCommand {
             } else if let _ = repo.range(of: #"\w+/\w+"#, options: .regularExpression) {
                 // Match a given repo in shorthand format
                 let extracted = repo.split(separator: "/")
-                guard extracted.count == 2 else { quit("Could not parse input: \(repo)") }
+                guard extracted.count == 2 else { defaultQuit() }
                 account = extracted[0]
                 repoName = extracted[1]
                 argumentURL = "https://github.com/\(repo).git"
             } else {
-                quit(
-                    """
-                    Could not parse input: \(repo)
-                    Ensure the input is either a full Git url with https:// and .git extension
-                    Or of the shorthand notation <account>/<repo>
-                    """)
+                defaultQuit()
             }
         }
 
         // Create account sub-folder if it doesn't already exist in the managed directory
         let accountFolder: Folder
         if !FileManager.default.fileExists(
-            atPath: folder.url.appendingPathComponent("\(account)").path)
-        {
-            accountFolder = try folder.createSubfolder(at: "\(account)")
+            atPath: managedFolder.url.appendingPathComponent("\(account)").path
+        ) {
+            accountFolder = try managedFolder.createSubfolder(at: "\(account)")
         } else {
-            accountFolder = try Folder(path: folder.url.appendingPathComponent("\(account)").path)
+            accountFolder = try Folder(path: managedFolder.url.appendingPathComponent("\(account)").path)
         }
 
         // Launch git

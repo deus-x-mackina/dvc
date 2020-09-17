@@ -4,6 +4,7 @@
 //
 
 import ArgumentParser
+import Foundation
 
 struct DVC: ParsableCommand {
     static var configuration = CommandConfiguration(
@@ -15,6 +16,10 @@ struct DVC: ParsableCommand {
 
     func run() throws {
         // If no subcommand is given, print the prefix is asked, otherwise display the help text
-        if prefix { print(MANAGED_PATH) } else { print(Self.helpMessage()) }
+        if prefix {
+            print(MANAGED_PATH)
+        } else {
+            print(Self.helpMessage())
+        }
     }
 }

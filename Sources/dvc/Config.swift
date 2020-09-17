@@ -17,36 +17,20 @@ let GIT_PATH = ProcessInfo.processInfo.environment["DVC_GIT"] ?? whichGit()
 let MANAGED_PATH = ProcessInfo.processInfo.environment["DVC_ROOT"] ?? {
     let home = ProcessInfo.processInfo.environment["HOME"] ?? {
         quit("""
-            Could not configure a path for DVC's root directory. You are seeing this
-            because neither the DVC_ROOT not HOME environment variables have been set.
-            """)
+        DVC: fatal: Could not configure a path for DVC's root directory. You are seeing this
+             because neither the DVC_ROOT not HOME environment variables have been set.
+        """)
     }()
-    return URL(fileURLWithPath: home).path
+    return URL(fileURLWithPath: home)
+        .appendingPathComponent(DEFAULT_MANAGED_DIR_NAME)
+        .path
 }()
 
-/// Helper function that is executed prior to parsing command line arguments directly.
-///
-/// It sets up the managed directory path and git executable path and ensures they exist.
-func configure() {
-    // Dont configure if invoked with help, version, prefix or no args
-    if CommandLine.argc == 1 || CommandLine.arguments.contains(where: { s in s.contains("help") })
-        || CommandLine.arguments.contains(where: { s in s.contains("prefix") })
-        || CommandLine.arguments.contains("-h")
-        || CommandLine.arguments.contains(where: { s in s.contains("version") })
-    {
-        return
-    }
-
-    // Make sure the git path we have is legit (whether obtained from the environment or via `which`)
-    guard FileManager.default.fileExists(atPath: GIT_PATH),
-        FileManager.default.isExecutableFile(atPath: GIT_PATH)
-    else { quit("Cannot find a usable git executable; tried: \(GIT_PATH)") }
-
+func createManagedDirectoryIfNeeded() {
     // Create the managed directory if it doesn't exist yet
     if !FileManager.default.fileExists(atPath: MANAGED_PATH) {
-        print(
-            """
-            WARNING: \
+        print("""
+            DVC: WARNING: \
             Managed directory does not exist yet. Creating directory at path: \(MANAGED_PATH)
             """)
         do {
@@ -55,39 +39,86 @@ func configure() {
             )
         } catch {
             quit("""
-                Error encountered creating managed directory at path: \(MANAGED_PATH)
-                Error message: \(error)
-                """)
+            DVC: Error encountered creating managed directory at path: \(MANAGED_PATH)
+                 Most likely, permission was denied and/or the location is not writeable.
+            """)
         }
     }
 }
 
 private func whichGit() -> String {
-    let which = Process()
-    let url = URL(fileURLWithPath: "/usr/bin/command")
-    // If we can't ge to `which` were are in big trouble!
-    guard FileManager.default.fileExists(atPath: url.path) else {
+    func defaultQuit() -> Never {
         quit("""
-        Error: Could not locate git executable automatically, and an absolute path was specified
-        through the DVC_GIT environment variable.
+        DVC: fatal: Could not locate a valid git executable automatically, and an absolute path was
+             specified through the DVC_GIT environment variable.
         """)
     }
 
-    if #available(macOS 10.13, *) { which.executableURL = url } else { which.launchPath = url.path }
+    let which = Process()
+    let url = URL(fileURLWithPath: "/usr/bin/command")
+    // If we can't ge to `which` were are in big trouble!
+    guard FileManager.default.fileExists(atPath: url.path),
+        FileManager.default.isExecutableFile(atPath: url.path)
+    else {
+        defaultQuit()
+    }
+
+    if #available(macOS 10.13, *) {
+        which.executableURL = url
+    } else {
+        which.launchPath = url.path
+    }
+
     which.arguments = ["-v", "git"]
     let pipe = Pipe()
     which.standardOutput = pipe
-    if #available(macOS 10.13, *) { try! which.run() } else { which.launch() }
+
+    if #available(macOS 10.13, *) {
+        do {
+            try which.run()
+        } catch {
+            defaultQuit()
+        }
+    } else {
+        which.launch()
+    }
     which.waitUntilExit()
     let data: Data
     if #available(macOS 10.15, *) {
-        data = try! pipe.fileHandleForReading.readToEnd()!
+        do {
+            guard let d = try pipe.fileHandleForReading.readToEnd() else {
+                defaultQuit()
+            }
+            data = d
+        } catch {
+            defaultQuit()
+        }
     } else {
         data = pipe.fileHandleForReading.readDataToEndOfFile()
     }
-    let rawOutput = String(data: data, encoding: .utf8)!
+    guard let rawOutput = String(data: data, encoding: .utf8) else {
+        defaultQuit()
+    }
     // Output contains a newline '\n', so we want to strip that
     let output = String(
-        rawOutput.prefix(through: rawOutput.index(rawOutput.endIndex, offsetBy: -2)))
+        rawOutput.prefix(through: rawOutput.index(rawOutput.endIndex, offsetBy: -2))
+    )
+
+    // Make sure the git path we have is legit (whether obtained from the environment or via search)
+    guard FileManager.default.fileExists(atPath: output),
+        FileManager.default.isExecutableFile(atPath: output)
+    else {
+        defaultQuit()
+    }
+
     return output
+}
+
+func validateManagedDirectory() {
+    guard FileManager.default.fileExists(atPath: MANAGED_PATH) else {
+        quit("""
+        DVC: fatal: Managed directory '\(MANAGED_PATH)' does not exist.
+             Aborting...
+        """)
+    }
 }

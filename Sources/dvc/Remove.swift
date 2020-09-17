@@ -28,18 +28,20 @@ struct Remove: ParsableCommand {
         """) var aggressiveClean = false
 
     func run() throws {
+        validateManagedDirectory()
+
         let (accountFolder, repoFolder) = extract(argument: repo)
 
         // Only delete a folder that is actually a Git repository!
         guard repoFolder.containsSubfolder(named: ".git") else {
-            quit("The folder '\(repoFolder.path)' is not a Git repository. Aborting...")
+            quit("DVC: The folder '\(repoFolder.path)' is not a Git repository. Aborting...")
         }
 
         try repoFolder.delete()
 
         if aggressiveClean {
             var abort = false
-            for subdir: Folder in accountFolder.subfolders {
+            for subdir in accountFolder.subfolders {
                 if subdir.containsSubfolder(named: ".git") {
                     abort = true
                     break

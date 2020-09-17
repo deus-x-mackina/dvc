@@ -15,6 +15,8 @@ struct List: ParsableCommand {
     @Option(help: "Display repos as rows or columns.") var display: DisplayOption = .rows
 
     func run() throws {
+        validateManagedDirectory()
+
         // Make sure we can get into the managed directory
         guard let baseDir = try? Folder(path: MANAGED_PATH) else {
             quit("Could not access managed directory at: \(MANAGED_PATH)")
@@ -41,7 +43,8 @@ struct List: ParsableCommand {
                     return sf.url.lastPathComponent
                 }
                 return (account, repos)
-            })
+            }
+        )
 
         // Now we construct a list of strings from the mappings, each of the format
         // '<account>/<repo>'
