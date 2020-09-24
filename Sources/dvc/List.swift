@@ -12,7 +12,8 @@ struct List: ParsableCommand {
         commandName: "ls", abstract: "List the currently cloned repos."
     )
 
-    @Option(help: "Display repos as rows or columns.") var display: DisplayOption = .rows
+    @Option(help: "Display repos as rows, columns, or grouped by account.")
+    var display: DisplayOption = .rows
 
     func run() throws {
         validateManagedDirectory()
@@ -45,6 +46,18 @@ struct List: ParsableCommand {
                 return (account, repos)
             }
         )
+
+        // Fork off here if display is set to grouped
+        guard !(display == .grouped) else {
+            for (index, (account, repos)) in mappings.enumerated() {
+                print("\(account)/")
+                repos.forEach { repo in
+                    print("--> \(repo)")
+                }
+                if index != mappings.count - 1 { print() }
+            }
+            return
+        }
 
         // Now we construct a list of strings from the mappings, each of the format
         // '<account>/<repo>'
@@ -94,7 +107,9 @@ struct List: ParsableCommand {
     }
 }
 
-enum DisplayOption: String, ExpressibleByArgument { case columns, rows }
+enum DisplayOption: String, ExpressibleByArgument {
+    case columns, rows, grouped
+}
 
 private func * (lhs: String, rhs: Int) -> String {
     switch rhs {
