@@ -8,7 +8,7 @@ import Foundation
 
 struct DVC: ParsableCommand {
     static var configuration = CommandConfiguration(
-        commandName: "dvc", abstract: "Manage cloned GitHub repos.", version: "0.1.0",
+        commandName: "dvc", abstract: "Manage cloned GitHub repos.", version: "0.1.4",
         subcommands: [Clone.self, Remove.self, List.self]
     )
 
