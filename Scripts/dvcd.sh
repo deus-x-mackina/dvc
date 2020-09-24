@@ -6,7 +6,7 @@
 # account folder or repo belonging to said account.
 function dvcd() {
     if command -v dvc >/dev/null; then
-        cd "$(dvc --prefix)" || (echo "Could not change into managed directory." ; exit 1)
+        cd "$(dvc prefix)" || (echo "Could not change into managed directory." ; exit 1)
         if [[ -n $1 ]]; then
             cd "$1" || (echo "Could not change into subdirectory: $1." ; exit 2)
         fi
