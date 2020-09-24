@@ -12,7 +12,7 @@ struct List: ParsableCommand {
         commandName: "ls", abstract: "List the currently cloned repos."
     )
 
-    @Option(help: "Display repos as rows, columns, or grouped by account.")
+    @Flag(help: "Display repos as rows, columns, or grouped by account.")
     var display: DisplayOption = .rows
 
     func run() throws {
@@ -107,7 +107,7 @@ struct List: ParsableCommand {
     }
 }
 
-enum DisplayOption: String, ExpressibleByArgument {
+enum DisplayOption: String, EnumerableFlag {
     case columns, rows, grouped
 }
 
